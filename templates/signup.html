@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-error {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .btn-signup {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-top: 10px;
+        }
+
+        .btn-signup:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-signup:active {
+            transform: translateY(0);
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 20px;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .footer-text a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .footer-text a:hover {
+            color: #764ba2;
+        }
+
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .password-requirements {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .password-requirements ul {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+
+        .password-requirements li {
+            margin-bottom: 4px;
+        }
+
+        .requirement-item {
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .requirement-check {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            background-color: #e9ecef;
+            color: #999;
+            flex-shrink: 0;
+        }
+
+        .requirement-check.valid {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .requirement-check.invalid {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .requirement-text {
+            flex: 1;
+        }
+
+        .password-validation-error {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 8px;
+            padding: 8px;
+            background-color: #f8d7da;
+            border-radius: 4px;
+            border: 1px solid #f5c6cb;
+            display: none;
+        }
+
+        .password-validation-error.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Create Account</h1>
+
+        <form method="POST">
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+            <!-- First Name Field -->
+            <div class="form-group">
+                <label for="first_name">First Name</label>
+                <input type="text" id="first_name" name="first_name" required>
+                <div class="form-error">
+                    {% if form.errors.first_name %}
+                        {{ form.errors.first_name }}
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Last Name Field -->
+            <div class="form-group">
+                <label for="last_name">Last Name</label>
+                <input type="text" id="last_name" name="last_name" required>
+                <div class="form-error">
+                    {% if form.errors.last_name %}
+                        {{ form.errors.last_name }}
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Email Field -->
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required>
+                <div class="form-error">
+                    {% if form.errors.email %}
+                        {{ form.errors.email }}
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Username Field -->
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+                <div class="form-error">
+                    {% if form.errors.username %}
+                        {{ form.errors.username }}
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Password Field -->
+            <div class="form-group">
+                <label for="password1">Password</label>
+                <input type="password" id="password1" name="password1" required onkeyup="validatePassword()">
+                <div class="form-error">
+                    {% if form.errors.password1 %}
+                        {{ form.errors.password1 }}
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Password Requirements -->
+            <div class="password-requirements">
+                <strong>Password Requirements:</strong>
+                <ul>
+                    <li class="requirement-item">
+                        <span class="requirement-check" id="length-check">✓</span>
+                        <span class="requirement-text">At least 8 characters long</span>
+                    </li>
+                    <li class="requirement-item">
+                        <span class="requirement-check" id="case-check">✓</span>
+                        <span class="requirement-text">Must contain uppercase and lowercase letters</span>
+                    </li>
+                    <li class="requirement-item">
+                        <span class="requirement-check" id="number-check">✓</span>
+                        <span class="requirement-text">Must contain numbers</span>
+                    </li>
+                    <li class="requirement-item">
+                        <span class="requirement-check" id="symbol-check">✓</span>
+                        <span class="requirement-text">Must contain 1 symbol</span>
+                    </li>
+                </ul>
+                <div class="password-validation-error" id="password-error"></div>
+            </div>
+
+            <!-- Confirm Password Field -->
+            <div class="form-group">
+                <label for="password2">Confirm Password</label>
+                <input type="password" id="password2" name="password2" required>
+                <div class="form-error">
+                    {% if form.errors.password2 %}
+                        {{ form.errors.password2 }}
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Sign Up Button -->
+            <button type="submit" class="btn-signup">Create Account</button>
+        </form>
+
+        <!-- Footer Links -->
+        <div class="footer-text">
+            Already have an account? <a href="/login/">Log in</a>
+        </div>
+    </div>
+
+    <script>
+        function validatePassword() {
+            const password = document.getElementById('password1').value;
+            const lengthCheck = document.getElementById('length-check');
+            const caseCheck = document.getElementById('case-check');
+            const numberCheck = document.getElementById('number-check');
+            const symbolCheck = document.getElementById('symbol-check');
+            const errorDiv = document.getElementById('password-error');
+
+            // Requirements
+            const hasLength = password.length >= 8;
+            const hasUpperCase = /[A-Z]/.test(password);
+            const hasLowerCase = /[a-z]/.test(password);
+            const hasCase = hasUpperCase && hasLowerCase;
+            const hasNumber = /[0-9]/.test(password);
+            const hasSymbol = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+
+            // Update visual indicators
+            updateRequirement(lengthCheck, hasLength);
+            updateRequirement(caseCheck, hasCase);
+            updateRequirement(numberCheck, hasNumber);
+            updateRequirement(symbolCheck, hasSymbol);
+
+            // Check if all requirements are met
+            const allRequirementsMet = hasLength && hasCase && hasNumber && hasSymbol;
+
+            // Show/hide error message
+            if (password.length > 0 && !allRequirementsMet) {
+                errorDiv.classList.add('show');
+                const missingRequirements = [];
+                if (!hasLength) missingRequirements.push('at least 8 characters');
+                if (!hasCase) missingRequirements.push('uppercase and lowercase letters');
+                if (!hasNumber) missingRequirements.push('numbers');
+                if (!hasSymbol) missingRequirements.push('a symbol');
+                errorDiv.textContent = 'Password must include: ' + missingRequirements.join(', ');
+            } else {
+                errorDiv.classList.remove('show');
+            }
+        }
+
+        function updateRequirement(element, isMet) {
+            if (isMet) {
+                element.classList.add('valid');
+                element.classList.remove('invalid');
+            } else {
+                element.classList.add('invalid');
+                element.classList.remove('valid');
+            }
+        }
+
+        // Form submission validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const password = document.getElementById('password1').value;
+            const hasLength = password.length >= 8;
+            const hasUpperCase = /[A-Z]/.test(password);
+            const hasLowerCase = /[a-z]/.test(password);
+            const hasCase = hasUpperCase && hasLowerCase;
+            const hasNumber = /[0-9]/.test(password);
+            const hasSymbol = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+
+            if (!hasLength || !hasCase || !hasNumber || !hasSymbol) {
+                e.preventDefault();
+                const errorDiv = document.getElementById('password-error');
+                errorDiv.classList.add('show');
+                const missingRequirements = [];
+                if (!hasLength) missingRequirements.push('at least 8 characters');
+                if (!hasCase) missingRequirements.push('uppercase and lowercase letters');
+                if (!hasNumber) missingRequirements.push('numbers');
+                if (!hasSymbol) missingRequirements.push('a symbol');
+                errorDiv.textContent = 'Password must include: ' + missingRequirements.join(', ');
+                document.getElementById('password1').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+    </script>
+</body>
+</html>

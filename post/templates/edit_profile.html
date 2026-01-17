@@ -1,0 +1,108 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="{% static 'post.css' %}"> 
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
+    <title>Edit Profile</title>
+</head>
+<body>
+    <main class="w-full mx-auto min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12">
+        <div class="max-w-2xl mx-auto px-4">
+            <!-- Header -->
+            <div class="flex items-center gap-4 mb-8">
+                <a href="{% url 'user_profile' request.user.username %}" class="text-gray-600 hover:text-blue-600 transition-colors">
+                    <i class="fa fa-arrow-left text-2xl"></i>
+                </a>
+                <h1 class="text-3xl font-bold text-gray-900">Edit Profile</h1>
+            </div>
+
+            <!-- Edit Form -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="p-8">
+                    <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                        {% csrf_token %}
+
+                        <!-- Bio -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-900 mb-2">
+                                <i class="fa fa-quote-left"></i> Bio
+                            </label>
+                            {{ form.bio }}
+                            {% if form.bio.errors %}
+                                <div class="text-red-600 text-sm mt-1">
+                                    {{ form.bio.errors }}
+                                </div>
+                            {% endif %}
+                            <p class="text-gray-600 text-sm mt-2">Tell people about yourself (max 500 characters)</p>
+                        </div>
+
+                        <!-- Avatar -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-900 mb-2">
+                                <i class="fa fa-image"></i> Profile Picture
+                            </label>
+                            {% if form.avatar.value %}
+                                <div class="mb-4">
+                                    <img src="{{ form.avatar.value.url }}" alt="Current Avatar" class="w-24 h-24 rounded-full object-cover border-2 border-blue-600">
+                                    <p class="text-gray-600 text-sm mt-2">Current profile picture</p>
+                                </div>
+                            {% endif %}
+                            {{ form.avatar }}
+                            {% if form.avatar.errors %}
+                                <div class="text-red-600 text-sm mt-1">
+                                    {{ form.avatar.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Website -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-900 mb-2">
+                                <i class="fa fa-globe"></i> Website
+                            </label>
+                            {{ form.website }}
+                            {% if form.website.errors %}
+                                <div class="text-red-600 text-sm mt-1">
+                                    {{ form.website.errors }}
+                                </div>
+                            {% endif %}
+                            <p class="text-gray-600 text-sm mt-2">Optional: Enter your website URL</p>
+                        </div>
+
+                        <!-- Location -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-900 mb-2">
+                                <i class="fa fa-map-marker"></i> Location
+                            </label>
+                            {{ form.location }}
+                            {% if form.location.errors %}
+                                <div class="text-red-600 text-sm mt-1">
+                                    {{ form.location.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="flex gap-4 pt-6 border-t border-gray-200">
+                            <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2">
+                                <i class="fa fa-check"></i>
+                                Save Changes
+                            </button>
+                            <a href="{% url 'user_profile' request.user.username %}" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-900 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2">
+                                <i class="fa fa-times"></i>
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

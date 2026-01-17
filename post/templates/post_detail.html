@@ -1,0 +1,192 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="{% static 'post.css' %}"> 
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>{{ post.title }}</title>
+</head>
+<body>
+    <main class="w-full mx-auto min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <div class="max-w-4xl mx-auto px-4 py-8">
+            <!-- Header -->
+            <div class="flex items-center gap-4 mb-8">
+                <a href="{% url 'posts_list' %}" class="text-gray-600 hover:text-blue-600 transition-colors">
+                    <i class="fa fa-arrow-left text-2xl"></i>
+                </a>
+                <h1 class="text-3xl font-bold text-gray-900">Back to Posts</h1>
+            </div>
+
+            <!-- Post Content -->
+            <article class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+                <!-- Post Image -->
+                {% if post.image %}
+                    <img class="w-full h-96 object-cover" src="{{ post.image.url }}" alt="{{ post.title }}" />
+                {% else %}
+                    <img class="w-full h-96 object-cover" src="https://static.vecteezy.com/vite/assets/photo-masthead-375-BoK_p8LG.webp" alt="Placeholder" />
+                {% endif %}
+
+                <!-- Post Body -->
+                <div class="p-8">
+                    <!-- Title & Author Info -->
+                    <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ post.title }}</h1>
+                    
+                    <div class="flex flex-wrap items-center gap-6 mb-8 pb-8 border-b border-gray-200">
+                        <!-- Author Profile -->
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                                {{ post.author.first_name|first|upper }}{{ post.author.last_name|first|upper }}
+                            </div>
+                            <div>
+                                <a href="{% url 'user_profile' post.author.username %}" class="font-semibold text-blue-600 hover:text-blue-700">
+                                    {{ post.author.get_full_name|default:post.author.username }}
+                                </a>
+                                <p class="text-gray-600 text-sm">@{{ post.author.username }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Metadata -->
+                        <div class="flex items-center gap-4 text-sm text-gray-600 ml-auto">
+                            <div class="flex items-center gap-2">
+                                <i class="fa fa-calendar"></i>
+                                {{ post.created_at|date:"M d, Y" }}
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fa fa-eye"></i>
+                                {{ post.view_count }} views
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fa fa-comment"></i>
+                                {{ post.get_comment_count }} comments
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="prose prose-lg max-w-none mb-8 text-gray-700 leading-relaxed">
+                        {{ post.content }}
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex flex-wrap items-center gap-4 py-6 border-t border-gray-200">
+                        <!-- Like Button -->
+                        <form method="POST" action="{% url 'toggle_like' post.id %}" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" class="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors {% if user_has_liked %}bg-red-100 text-red-600 hover:bg-red-200{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
+                                <i class="fa fa-heart{% if not user_has_liked %}o{% endif %}"></i>
+                                {{ post.get_like_count }} Like{{ post.get_like_count|pluralize }}
+                            </button>
+                        </form>
+
+                        <!-- Social Share -->
+                        <div class="flex items-center gap-2 ml-auto">
+                            <span class="text-gray-600 text-sm font-semibold">Share:</span>
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center hover:bg-blue-200 transition-colors">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ post.title }}" target="_blank" class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center hover:bg-blue-200 transition-colors">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri }}" target="_blank" class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center hover:bg-blue-200 transition-colors">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                            <button onclick="copyToClipboard()" class="w-10 h-10 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-gray-200 transition-colors" title="Copy link">
+                                <i class="fa fa-link"></i>
+                            </button>
+                        </div>
+
+                        <!-- Edit/Delete (Owner Only) -->
+                        {% if post.author == user %}
+                        <div class="flex gap-3 w-full mt-4">
+                            <a href="{% url 'edit_post' post.id %}" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold text-center transition-colors flex items-center justify-center gap-2">
+                                <i class="fa fa-pencil"></i>
+                                Edit Post
+                            </a>
+                            <form method="POST" action="{% url 'delete_post' post.id %}" style="flex: 1;" onsubmit="return confirm('Are you sure you want to delete this post?');">
+                                {% csrf_token %}
+                                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2">
+                                    <i class="fa fa-trash"></i>
+                                    Delete Post
+                                </button>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </article>
+
+            <!-- Comments Section -->
+            <section class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="p-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                        <i class="fa fa-comments"></i>
+                        Comments ({{ post.get_comment_count }})
+                    </h2>
+
+                    <!-- Comment Form -->
+                    <form method="POST" action="{% url 'add_comment' post.id %}" class="mb-8">
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            {{ comment_form.content }}
+                        </div>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors">
+                            Post Comment
+                        </button>
+                    </form>
+
+                    <!-- Comments List -->
+                    {% if comments %}
+                        <div class="space-y-4">
+                            {% for comment in comments %}
+                            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                                            {{ comment.author.first_name|first|upper }}{{ comment.author.last_name|first|upper }}
+                                        </div>
+                                        <div>
+                                            <a href="{% url 'user_profile' comment.author.username %}" class="font-semibold text-blue-600 hover:text-blue-700">
+                                                {{ comment.author.get_full_name|default:comment.author.username }}
+                                            </a>
+                                            <p class="text-gray-600 text-xs">{{ comment.created_at|date:"M d, Y H:i" }}</p>
+                                        </div>
+                                    </div>
+                                    {% if comment.author == user %}
+                                    <form method="POST" action="{% url 'delete_comment' comment.id %}" style="display:inline;" onsubmit="return confirm('Delete this comment?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="text-red-600 hover:text-red-700 text-sm font-semibold">
+                                            <i class="fa fa-trash"></i> Delete
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                                <p class="text-gray-700 ml-13">{{ comment.content }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                    <div class="text-center py-12 text-gray-600">
+                        <i class="fa fa-comments text-4xl text-gray-300 mb-4 block"></i>
+                        <p>No comments yet. Be the first to comment!</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        function copyToClipboard() {
+            const url = window.location.href;
+            navigator.clipboard.writeText(url).then(() => {
+                alert('Link copied to clipboard!');
+            });
+        }
+    </script>
+</body>
+</html>
